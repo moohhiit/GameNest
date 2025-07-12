@@ -1,5 +1,5 @@
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
-
+// const { withReanimated } = require('react-native-reanimated/plugin');
 /**
  * Metro configuration
  * https://reactnative.dev/docs/metro
