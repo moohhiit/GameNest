@@ -1,6 +1,7 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native'
+import SPSLogo from '../../assets/svg/F.svg'
 
 export default function SPSGameOption() {
 
@@ -10,10 +11,8 @@ export default function SPSGameOption() {
   return (
     <View style={{ flex: 1, backgroundColor: '#B8CFCE' }}>
       <View style={{ flex: 2, padding: 10, flexDirection: 'row', justifyContent: 'space-around' }}>
-        <Image
-          source={require('../../assets/images/Stone-paper-scissor-gametheam.png')}
-          style={{ height: '82%', width: '40%' }}
-        />
+        <SPSLogo width={'40%'} height={'82%'} />
+
         <View>
           <Text style={{ fontSize: 40, fontFamily: 'serif' }} >Stone</Text>
           <Text style={{ fontSize: 40, fontFamily: 'serif' }} >Paper</Text>
@@ -22,10 +21,10 @@ export default function SPSGameOption() {
       </View>
       <View style={{ flex: 8, paddingHorizontal: 40, paddingVertical: 10, gap: 50, }} >
         <TouchableOpacity
-        onPress={()=>{
-          Navigation.navigate('LSPS' as never)
-        }}
-        style={{ flexDirection: 'row', backgroundColor: 'white', padding: 10, borderRadius: 20, elevation: 5, justifyContent: 'space-between', paddingHorizontal: 20 , paddingVertical:20 }} >
+          onPress={() => {
+            Navigation.navigate('LSPS' as never)
+          }}
+          style={{ flexDirection: 'row', backgroundColor: 'white', padding: 10, borderRadius: 20, elevation: 5, justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 20 }} >
           <View style={{ alignItems: 'center', alignSelf: 'center' }} >
             <Text style={{ fontSize: 30, fontFamily: 'serif' }} >Local</Text>
             <Text style={{ fontSize: 30, fontFamily: 'serif' }} >Play</Text>

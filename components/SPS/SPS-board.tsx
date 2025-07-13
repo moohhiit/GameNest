@@ -93,7 +93,7 @@ export default function SPSboard(
               <Image source={require('../../assets/images/Paper.png')} style={{ alignSelf: 'center' }} />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => { ChooseOption('Scissor') }}
+              onPress={() => ringRef.current?.triggerWin()}
               style={{ backgroundColor: "#FFFFFF", width: "25%", justifyContent: 'center', height: '50%', borderRadius: '50%', elevation: 6 }} >
               <Image source={require('../../assets/images/Scissor.png')} style={{ alignSelf: 'center' }} />
             </TouchableOpacity>
