@@ -2,41 +2,61 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Text, Dimensions, Image, TouchableOpacity } from 'react-native';
 
 import AvatarRing, { AvatarRingRef } from './Flip-Ring-Animation';
+import { getSPSGameResult } from '../../utils/SPSLogic';
 
 type PlayerDetail = {
   player_name: string,
   avatar: any,
 
 }
+type Choose = 'stone' | 'paper' | 'scissors' | 'Questionmark'
 
 type Props = {
-  winRoundPlayer1: number,
-  winRoundPlayer2: number,
   PlyerTwoDetail: PlayerDetail,
   LocalPlayerDetail: PlayerDetail,
-  ChooseOption: (option: string) => void,
-  ChoosedOptionbyPlyer2: String,
-  CompletedRound: number,
-  
+
 }
 
 
 const HIGHT = Dimensions.get('screen').height
 
-export default function SPSboard(
-  { winRoundPlayer1 = 0,
-    winRoundPlayer2 = 0,
-    LocalPlayerDetail = { player_name: "Player 1", avatar: "" },
-    ChooseOption,
-    ChoosedOptionbyPlyer2,
-    CompletedRound = 0,
-    PlyerTwoDetail = { player_name: "Player 1", avatar: "" }
-  }: Props
-) {
+export default function LocalSPSBoard({
+  LocalPlayerDetail = { player_name: "Player 1", avatar: "" },
+  PlyerTwoDetail = { player_name: "Player 1", avatar: "" }
+}: Props) {
+  const [optionPlayer1, setOptionPlayer1] = useState<Choose>('Questionmark')
+  const [optionPlayer2, setOptionPlayer2] = useState<Choose>('Questionmark')
+  const [CompletedRound, setCompletedRound] = useState(0)
+  const [winRoundPlayer1, setwinRoundPlayer1] = useState(0)
+  const [winRoundPlayer2, setwinRoundPlayer2] = useState(0)
   const [toggleturn, settoggelTurn] = useState(true)
-  const ringRef = useRef<AvatarRingRef>(null)
+
+  const playerImages = {
+    Questionmark: require('../../assets/images/Questionmark.png'),
+    stone: require('../../assets/images/stone.png'),
+    paper: require('../../assets/images/paper.png'),
+    scissors: require('../../assets/images/scissors.png'),
+  };
+  const ringRef1 = useRef<AvatarRingRef>(null)
   const ringRef2 = useRef<AvatarRingRef>(null)
 
+  const showResult = ()=>{
+    const result = getSPSGameResult(optionPlayer1 , optionPlayer2)
+    if(result){
+      ringRef1.current?.triggerWin()
+      setwinRoundPlayer1(winRoundPlayer1 + 1)
+      setCompletedRound(CompletedRound + 1)
+    }
+    else{
+      ringRef2.current?.triggerWin()
+      setwinRoundPlayer2(winRoundPlayer2 + 1)
+      setCompletedRound(CompletedRound + 1)
+    }
+  }
+
+  useEffect(() => {
+    ringRef1.current?.flipRing()
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -61,76 +81,113 @@ export default function SPSboard(
         </View>
       </View>
       <View style={{ flex: 8, }} >
-        <View style={{ flex: 1, justifyContent: 'flex-end', flexDirection: 'row' }} >
+        <View style={{ flex: 1, justifyContent: 'space-between', flexDirection: 'row' }} >
           {/* Win Round Indicator */}
+          {
+            optionPlayer2 !== "Questionmark" && !toggleturn ?
+              <TouchableOpacity style={{ left: 50, justifyContent: 'center', paddingHorizontal: 10, backgroundColor: '#222831', borderRadius: 10 }}
+                onPress={() => {
+                  ringRef1.current?.flipRing()
+                  settoggelTurn(!toggleturn)
+                  showResult()
+                }}
+              >
+                <Text style={{ fontSize: 25, color: 'white' }} >
+                  Confirm
+                </Text>
+              </TouchableOpacity> : <View></View>
+          }
           <View style={{ width: '15%', borderBottomLeftRadius: 80, backgroundColor: 'red', flexDirection: 'row-reverse', justifyContent: 'center', elevation: 6 }} >
             <Text style={{ fontSize: 40, fontWeight: '700' }} >
               {winRoundPlayer2}
             </Text>
           </View>
+
         </View>
         <View style={{ flex: 9 }} >
           {
             !toggleturn ? <View style={{ backgroundColor: '#B8CFCE', flex: 3, justifyContent: 'space-evenly', flexDirection: 'row', alignItems: 'center' }} >
               {/* Options */}
               <TouchableOpacity
-                onPress={() => ringRef.current?.flipRing()}
+                onPress={() => setOptionPlayer2('stone')}
                 style={{ backgroundColor: "#FFFFFF", width: "25%", justifyContent: 'center', height: '50%', borderRadius: '50%', elevation: 6 }} >
-                <Image source={require('../../assets/images/Stone.png')} style={{ alignSelf: 'center' }} />
+                <Image source={require('../../assets/images/stone.png')} style={{ alignSelf: 'center' }} />
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => ringRef2.current?.startAnimation()}
+                onPress={() => setOptionPlayer2('paper')}
                 style={{ backgroundColor: "#FFFFFF", width: "25%", justifyContent: 'center', height: '50%', borderRadius: '50%', elevation: 6 }} >
-                <Image source={require('../../assets/images/Paper.png')} style={{ alignSelf: 'center' }} />
+                <Image source={require('../../assets/images/paper.png')} style={{ alignSelf: 'center' }} />
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => ringRef.current?.triggerWin()}
+                onPress={() => setOptionPlayer2('scissors')}
                 style={{ backgroundColor: "#FFFFFF", width: "25%", justifyContent: 'center', height: '50%', borderRadius: '50%', elevation: 6 }} >
-                <Image source={require('../../assets/images/Scissor.png')} style={{ alignSelf: 'center' }} />
+                <Image source={require('../../assets/images/scissors.png')} style={{ alignSelf: 'center' }} />
               </TouchableOpacity>
 
             </View> : null
           }
           <View style={{ flex: 3, justifyContent: 'center', flexDirection: 'row', backgroundColor: '#B8CFCE', alignItems: 'center' }} >
 
-            <AvatarRing ref={ringRef} frontImage={require('../../assets/images/Question-mark.png')} backImage={require('../../assets/images/Stone.png')} AVATAR_SIZE={120} RING_SIZE={160} RADIUS={75} STROKE_WIDTH={5} TIME={10} BORDER_RADIUS={50} />
+            <AvatarRing ref={ringRef2} frontImage={require('../../assets/images/Questionmark.png')} backImage={playerImages[optionPlayer2]} AVATAR_SIZE={120} RING_SIZE={160} RADIUS={75} STROKE_WIDTH={5} TIME={10} BORDER_RADIUS={50} />
 
 
           </View>
 
           <View style={{ flex: 3, justifyContent: 'center', flexDirection: 'row', alignItems: 'center' }} >
-            <AvatarRing ref={ringRef2} frontImage={require('../../assets/images/Question-mark.png')} backImage={require('../../assets/images/Stone.png')} AVATAR_SIZE={120} RING_SIZE={160} RADIUS={75} STROKE_WIDTH={5} TIME={10} BORDER_RADIUS={50} />
+            <AvatarRing ref={ringRef1} frontImage={require('../../assets/images/Questionmark.png')} backImage={playerImages[optionPlayer1]} AVATAR_SIZE={120} RING_SIZE={160} RADIUS={75} STROKE_WIDTH={5} TIME={10} BORDER_RADIUS={50} />
 
           </View>
           {toggleturn ? <View style={{ backgroundColor: '#B8CFCE', flex: 3, justifyContent: 'space-evenly', flexDirection: 'row', alignItems: 'center' }} >
             {/* Options */}
             <TouchableOpacity
-              onPress={() => ringRef.current?.flipRing()}
+              onPress={() => {
+                setOptionPlayer1('stone')
+              }
+              }
               style={{ backgroundColor: "#FFFFFF", width: "25%", justifyContent: 'center', height: '50%', borderRadius: '50%', elevation: 6 }} >
-              <Image source={require('../../assets/images/Stone.png')} style={{ alignSelf: 'center' }} />
+              <Image source={require('../../assets/images/stone.png')} style={{ alignSelf: 'center' }} />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => ringRef2.current?.startAnimation()}
+              onPress={() => {
+                setOptionPlayer1('paper')
+              }}
               style={{ backgroundColor: "#FFFFFF", width: "25%", justifyContent: 'center', height: '50%', borderRadius: '50%', elevation: 6 }} >
-              <Image source={require('../../assets/images/Paper.png')} style={{ alignSelf: 'center' }} />
+              <Image source={require('../../assets/images/paper.png')} style={{ alignSelf: 'center' }} />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => ringRef.current?.triggerWin()}
+              onPress={() => {
+                setOptionPlayer1('scissors')
+              }}
               style={{ backgroundColor: "#FFFFFF", width: "25%", justifyContent: 'center', height: '50%', borderRadius: '50%', elevation: 6 }} >
-              <Image source={require('../../assets/images/Scissor.png')} style={{ alignSelf: 'center' }} />
+              <Image source={require('../../assets/images/scissors.png')} style={{ alignSelf: 'center' }} />
             </TouchableOpacity>
 
           </View> : null}
 
 
         </View>
-        <View style={{ flex: 1, justifyContent: "flex-start", flexDirection: 'row' }} >
+        <View style={{ flex: 1, justifyContent: "space-between", flexDirection: 'row', }} >
           {/* Win Round Indiactor */}
           <View style={{ backgroundColor: 'white', width: '15%', borderTopRightRadius: 80, justifyContent: 'center', padding: 10, elevation: 6 }} >
             <Text style={{ fontSize: 40, fontWeight: '700' }} >
               {winRoundPlayer1}
             </Text>
           </View>
+          {
+            optionPlayer1 !== "Questionmark" && toggleturn ?
+              <TouchableOpacity style={{ right: 50, justifyContent: 'center', paddingHorizontal: 10, backgroundColor: '#222831', borderRadius: 10 }}
+                onPress={() => {
+                  ringRef1.current?.flipRing()
+                  settoggelTurn(!toggleturn)
+                  ringRef2.current?.flipRing()
+                }}
+              >
+                <Text style={{ fontSize: 25, color: 'white' }} >
+                  Conferm
+                </Text>
+              </TouchableOpacity> : null
+          }
+
         </View>
 
 
